@@ -1,0 +1,6 @@
+name: CauldronPotion
+version: '${version}'
+main: net.violetc.cauldronpotion.CauldronPotion
+api-version: 1.19
+depend: [ violetcpluginutil ]
+authors: [ violetc ]
