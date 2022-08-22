@@ -15,7 +15,7 @@ public class ConfigOBJ extends JsonConfig<ConfigOBJ> {
 
     public boolean displayPotionMeta;
     public boolean displayMoreMes;
-    public boolean showCauldronParticle;
+    public boolean alwaysShowCauldronParticle;
     public boolean saveCauldronDataOnStop;
     public boolean randomPotionRecipe;
 
@@ -29,7 +29,7 @@ public class ConfigOBJ extends JsonConfig<ConfigOBJ> {
 
         displayPotionMeta = true;
         displayMoreMes = false;
-        showCauldronParticle = false;
+        alwaysShowCauldronParticle = false;
         saveCauldronDataOnStop = false;
         randomPotionRecipe = true;
 

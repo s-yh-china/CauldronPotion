@@ -1,7 +1,10 @@
 package net.violetc.cauldronpotion;
 
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -501,5 +504,9 @@ public class PotionHelper {
         }
 
         return list;
+    }
+
+    public static void spawnPotionParticle(@NotNull World world, @NotNull Color color, @NotNull Location location) {
+        world.spawnParticle(Particle.SPELL_MOB, location, 10, 0.5, 0.5, 0.5, color.asRGB());
     }
 }

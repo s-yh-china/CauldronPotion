@@ -198,18 +198,25 @@ public class CauldronEntity {
                                 item.remove();
                                 if (item.getItemStack().getType() == Material.GUNPOWDER) {
                                     isSplash = true;
+                                    PotionHelper.spawnPotionParticle(world, PotionHelper.getPotionColor(damage), block.getLocation().add(0, 0.7, 0));
+                                    this.world.playSound(block.getLocation(), Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, 2.5F, 1.0F);
                                     continue;
                                 }
 
                                 if (item.getItemStack().getType() == Material.DRAGON_BREATH) {
                                     isLingering = true;
+                                    PotionHelper.spawnPotionParticle(world, PotionHelper.getPotionColor(damage), block.getLocation().add(0, 0.7, 0));
+                                    this.world.playSound(block.getLocation(), Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, 2.5F, 1.0F);
                                     continue;
                                 }
 
                                 for (int i = item.getItemStack().getAmount(); i > 0; i--) {
-                                    this.damage = PotionHelper.getDamageChange(item.getItemStack().getType(), damage);
+                                    int newDamage = PotionHelper.getDamageChange(item.getItemStack().getType(), damage);
+                                    if (ConfigOBJ.config.alwaysShowCauldronParticle || newDamage != damage) {
+                                        PotionHelper.spawnPotionParticle(world, PotionHelper.getPotionColor(damage), block.getLocation().add(0.5, 0.85, 0.5));
+                                    }
+                                    this.damage = newDamage;
                                     this.world.playSound(block.getLocation(), Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, 2.5F, 1.0F);
-                                    // TODO sound and particle
                                 }
                             }
                         }
