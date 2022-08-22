@@ -52,6 +52,15 @@ public class CauldronEntityManger {
         return entities.containsKey(block);
     }
 
+    @NotNull
+    public CauldronEntity getOrAddEntity(@NotNull Block block) {
+        if (hasEntity(block)) {
+            return getEntity(block);
+        } else {
+            return addEntity(block);
+        }
+    }
+
     @Nullable
     public CauldronEntity getEntity(@NotNull Block block) {
         return entities.get(block);

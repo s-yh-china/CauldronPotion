@@ -38,10 +38,11 @@ public class CauldronListener implements Listener {
             event.setCancelled(true);
         }
 
+        CauldronEntity entity = CauldronEntityManger.getManger().getOrAddEntity(event.getBlock());
+
         if (event.getReason() == CauldronLevelChangeEvent.ChangeReason.NATURAL_FILL) {
             if (CauldronEntityManger.getManger().hasEntity(event.getBlock())) {
-                CauldronEntity entity = CauldronEntityManger.getManger().getEntity(event.getBlock());
-                if (entity != null && entity.isCanBrewing()) {
+                if (entity.isCanBrewing()) {
                     entity.setAddWater(true);
                 }
             }
@@ -54,57 +55,50 @@ public class CauldronListener implements Listener {
             Block block = event.getClickedBlock();
             ItemStack item = event.getItem();
             if (block.getType() == Material.CAULDRON || block.getType() == Material.WATER_CAULDRON) {
-                CauldronEntity entity;
-                if (CauldronEntityManger.getManger().hasEntity(block)) {
-                    entity = CauldronEntityManger.getManger().getEntity(block);
-                } else {
-                    entity = CauldronEntityManger.getManger().addEntity(block);
-                }
+                CauldronEntity entity = CauldronEntityManger.getManger().getOrAddEntity(block);
 
-                if (entity != null) {
-                    if (item.getType() == Material.WATER_BUCKET) {
-                        if (entity.isCanBrewing()) {
-                            entity.setAddWater(true);
-                        }
-                    } else if (item.getType() == Material.POTION) {
-                        PotionMeta meta = (PotionMeta) item.getItemMeta();
-                        if (meta != null) {
-                            if (meta.getBasePotionData().getType() == PotionType.WATER) {
-                                if (meta.hasCustomEffects() || PersistentDataUtil.getBoolData(meta, NamespaceSave.NEW_POTION_FLAG)) {
-                                    event.setCancelled(true);
-                                    if (entity.isCanBrewing() && entity.getDamage() != 0) {
-                                        block.getWorld().createExplosion(block.getLocation(), 0, true, false, event.getPlayer());
-                                        entity.cleanPotion();
+                if (item.getType() == Material.WATER_BUCKET) {
+                    if (entity.isCanBrewing()) {
+                        entity.setAddWater(true);
+                    }
+                } else if (item.getType() == Material.POTION) {
+                    PotionMeta meta = (PotionMeta) item.getItemMeta();
+                    if (meta != null) {
+                        if (meta.getBasePotionData().getType() == PotionType.WATER) {
+                            if (meta.hasCustomEffects() || PersistentDataUtil.getBoolData(meta, NamespaceSave.NEW_POTION_FLAG)) {
+                                event.setCancelled(true);
+                                if (entity.isCanBrewing() && entity.getDamage() != 0) {
+                                    block.getWorld().createExplosion(block.getLocation(), 0, true, false, event.getPlayer());
+                                    entity.cleanPotion();
 
-                                        block.setType(Material.CAULDRON);
-                                        item.setType(Material.GLASS_BOTTLE);
-                                        item.setItemMeta(null);
+                                    block.setType(Material.CAULDRON);
+                                    item.setType(Material.GLASS_BOTTLE);
+                                    item.setItemMeta(null);
 
-                                        block.getWorld().playSound(block.getLocation(), Sound.ITEM_BOTTLE_EMPTY, 1, 1);
-                                    }
-                                } else if (entity.isCanBrewing()) {
-                                    entity.setAddWater(true);
+                                    block.getWorld().playSound(block.getLocation(), Sound.ITEM_BOTTLE_EMPTY, 1, 1);
                                 }
+                            } else if (entity.isCanBrewing()) {
+                                entity.setAddWater(true);
                             }
                         }
                     }
+                }
 
-                    if (item.getType() == Material.GLASS_BOTTLE && entity.isCanBrewing()) {
-                        event.setCancelled(true);
-                        Levelled level = (Levelled) block.getBlockData();
-                        if (level.getLevel() != 0) {
-                            ItemStack potion = entity.getPotion();
-                            if (level.getLevel() == 1) {
-                                block.setType(Material.CAULDRON);
-                            } else {
-                                level.setLevel(level.getLevel() - 1);
-                                block.setBlockData(level);
-                            }
-                            block.getWorld().playSound(block.getLocation(), Sound.ITEM_BOTTLE_FILL, 1, 1);
-
-                            item.setAmount(item.getAmount() - 1);
-                            event.getPlayer().getInventory().addItem(potion);
+                if (item.getType() == Material.GLASS_BOTTLE && entity.isCanBrewing() && block.getType() == Material.WATER_CAULDRON) {
+                    event.setCancelled(true);
+                    Levelled level = (Levelled) block.getBlockData();
+                    if (level.getLevel() != 0) {
+                        ItemStack potion = entity.getPotion();
+                        if (level.getLevel() == 1) {
+                            block.setType(Material.CAULDRON);
+                        } else {
+                            level.setLevel(level.getLevel() - 1);
+                            block.setBlockData(level);
                         }
+                        block.getWorld().playSound(block.getLocation(), Sound.ITEM_BOTTLE_FILL, 1, 1);
+
+                        item.setAmount(item.getAmount() - 1);
+                        event.getPlayer().getInventory().addItem(potion);
                     }
                 }
             }
