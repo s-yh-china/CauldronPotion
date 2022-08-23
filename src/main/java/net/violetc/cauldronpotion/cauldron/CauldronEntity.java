@@ -59,16 +59,7 @@ public class CauldronEntity {
                 return new PotionBuilder().setBasePotionData(new PotionData(PotionType.WATER)).build();
             }
 
-            ItemStack potion;
-            if (isSplash) {
-                if (isLingering) {
-                    potion = new ItemStack(Material.LINGERING_POTION);
-                } else {
-                    potion = new ItemStack(Material.SPLASH_POTION);
-                }
-            } else {
-                potion = new ItemStack(Material.POTION);
-            }
+            ItemStack potion = getPotionTypeItem();
             PotionMeta meta = (PotionMeta) potion.getItemMeta();
 
             if (meta != null) {
@@ -85,12 +76,28 @@ public class CauldronEntity {
                     meta.setLore(List.of(ChatColor.GRAY + "你并不知晓其中的效果"));
                     meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
                 }
+
+                if (ConfigOBJ.config.displayPotionMeta && ConfigOBJ.config.displayPotionDamage) {
+                    meta.setLore(List.of(ChatColor.GRAY + "药水修饰值: " + damage));
+                }
             }
             potion.setItemMeta(meta);
 
             return potion;
         } else {
             return null;
+        }
+    }
+
+    public ItemStack getPotionTypeItem() {
+        if (isSplash) {
+            if (isLingering) {
+                return new ItemStack(Material.LINGERING_POTION);
+            } else {
+                return new ItemStack(Material.SPLASH_POTION);
+            }
+        } else {
+            return new ItemStack(Material.POTION);
         }
     }
 
@@ -197,16 +204,20 @@ public class CauldronEntity {
                             if (PotionHelper.isBrewingItem(item.getItemStack())) {
                                 item.remove();
                                 if (item.getItemStack().getType() == Material.GUNPOWDER) {
+                                    if (ConfigOBJ.config.alwaysShowCauldronParticle || !isSplash) {
+                                        PotionHelper.spawnPotionParticle(world, PotionHelper.getPotionColor(damage), block.getLocation().add(0, 0.7, 0));
+                                    }
+                                    PotionHelper.playCauldronAddItemSound(world, block.getLocation());
                                     isSplash = true;
-                                    PotionHelper.spawnPotionParticle(world, PotionHelper.getPotionColor(damage), block.getLocation().add(0, 0.7, 0));
-                                    this.world.playSound(block.getLocation(), Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, 2.5F, 1.0F);
                                     continue;
                                 }
 
                                 if (item.getItemStack().getType() == Material.DRAGON_BREATH) {
+                                    if (ConfigOBJ.config.alwaysShowCauldronParticle || !isLingering) {
+                                        PotionHelper.spawnPotionParticle(world, PotionHelper.getPotionColor(damage), block.getLocation().add(0, 0.7, 0));
+                                    }
+                                    PotionHelper.playCauldronAddItemSound(world, block.getLocation());
                                     isLingering = true;
-                                    PotionHelper.spawnPotionParticle(world, PotionHelper.getPotionColor(damage), block.getLocation().add(0, 0.7, 0));
-                                    this.world.playSound(block.getLocation(), Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, 2.5F, 1.0F);
                                     continue;
                                 }
 
@@ -215,8 +226,8 @@ public class CauldronEntity {
                                     if (ConfigOBJ.config.alwaysShowCauldronParticle || newDamage != damage) {
                                         PotionHelper.spawnPotionParticle(world, PotionHelper.getPotionColor(damage), block.getLocation().add(0.5, 0.85, 0.5));
                                     }
+                                    PotionHelper.playCauldronAddItemSound(world, block.getLocation());
                                     this.damage = newDamage;
-                                    this.world.playSound(block.getLocation(), Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, 2.5F, 1.0F);
                                 }
                             }
                         }

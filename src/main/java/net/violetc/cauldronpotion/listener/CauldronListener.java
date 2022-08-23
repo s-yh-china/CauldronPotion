@@ -1,5 +1,6 @@
 package net.violetc.cauldronpotion.listener;
 
+import net.violetc.cauldronpotion.ConfigOBJ;
 import net.violetc.cauldronpotion.NamespaceSave;
 import net.violetc.cauldronpotion.cauldron.CauldronEntity;
 import net.violetc.cauldronpotion.cauldron.CauldronEntityManger;
@@ -11,6 +12,8 @@ import org.bukkit.block.data.Levelled;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -26,6 +29,30 @@ public class CauldronListener implements Listener {
         if (event.getBlockPlaced().getType() == Material.CAULDRON) {
             if (!CauldronEntityManger.getManger().hasEntity(event.getBlock())) {
                 CauldronEntityManger.getManger().addEntity(event.getBlock());
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPistonExtend(@NotNull BlockPistonExtendEvent event) {
+        if (ConfigOBJ.config.disableCauldronMoveByPiston) {
+            for (Block block : event.getBlocks()) {
+                if (block.getType() == Material.CAULDRON || block.getType() == Material.WATER_CAULDRON) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPistonRetract(@NotNull BlockPistonRetractEvent event) {
+        if (ConfigOBJ.config.disableCauldronMoveByPiston) {
+            for (Block block : event.getBlocks()) {
+                if (block.getType() == Material.CAULDRON || block.getType() == Material.WATER_CAULDRON) {
+                    event.setCancelled(true);
+                    return;
+                }
             }
         }
     }

@@ -14,9 +14,12 @@ public class ConfigOBJ extends JsonConfig<ConfigOBJ> {
     public boolean disableOldPotion;
 
     public boolean displayPotionMeta;
-    public boolean displayMoreMes;
+    public boolean displayPotionDamage;
+
     public boolean alwaysShowCauldronParticle;
     public boolean saveCauldronDataOnStop;
+    public boolean disableCauldronMoveByPiston;
+
     public boolean randomPotionRecipe;
 
     public long potionSeed;
@@ -28,9 +31,12 @@ public class ConfigOBJ extends JsonConfig<ConfigOBJ> {
         disableOldPotion = false;
 
         displayPotionMeta = true;
-        displayMoreMes = false;
+        displayPotionDamage = false;
+
         alwaysShowCauldronParticle = false;
         saveCauldronDataOnStop = false;
+        disableCauldronMoveByPiston = false;
+
         randomPotionRecipe = true;
 
         potionSeed = Bukkit.getWorlds().get(0).getSeed();

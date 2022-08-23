@@ -4,6 +4,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -169,7 +170,7 @@ public class PotionHelper {
     }
 
     public static int getPrefixNumber(int damage) {
-        return getNumberInBinaryDamage(damage, 14, 9, 7, 3, 2);
+        return getNumberInBinaryDamage(damage, 14, 9, 7, 3, 2) % 30; // cycle
     }
 
     public static String getPotionPrefix(int damage) {
@@ -507,6 +508,10 @@ public class PotionHelper {
     }
 
     public static void spawnPotionParticle(@NotNull World world, @NotNull Color color, @NotNull Location location) {
-        world.spawnParticle(Particle.SPELL_MOB, location, 10, 0.5, 0.5, 0.5, color.asRGB());
+        world.spawnParticle(Particle.SPELL_MOB, location, 10, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
+    }
+
+    public static void playCauldronAddItemSound(@NotNull World world, @NotNull Location location) {
+        world.playSound(location, Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, 2.5F, 1.0F);
     }
 }
