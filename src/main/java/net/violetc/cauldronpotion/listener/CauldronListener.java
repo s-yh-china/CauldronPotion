@@ -95,7 +95,7 @@ public class CauldronListener implements Listener {
                             if (meta.hasCustomEffects() || PersistentDataUtil.getBoolData(meta, NamespaceSave.NEW_POTION_FLAG)) {
                                 event.setCancelled(true);
                                 if (entity.isCanBrewing() && entity.getDamage() != 0) {
-                                    block.getWorld().createExplosion(block.getLocation(), 0, true, false, event.getPlayer());
+                                    block.getWorld().createExplosion(block.getLocation(), 1, true, false, event.getPlayer());
                                     entity.cleanPotion();
 
                                     block.setType(Material.CAULDRON);
@@ -107,25 +107,50 @@ public class CauldronListener implements Listener {
                             } else if (entity.isCanBrewing()) {
                                 entity.setAddWater(true);
                             }
+                        } else {
+                            event.setCancelled(true);
+                            if (entity.isCanBrewing()) {
+                                block.getWorld().createExplosion(block.getLocation(), 2, true, false, event.getPlayer());
+                                entity.cleanPotion();
+
+                                block.setType(Material.CAULDRON);
+                                item.setType(Material.GLASS_BOTTLE);
+                                item.setItemMeta(null);
+
+                                block.getWorld().playSound(block.getLocation(), Sound.ITEM_BOTTLE_EMPTY, 1, 1);
+                            }
                         }
                     }
                 }
 
-                if (item.getType() == Material.GLASS_BOTTLE && entity.isCanBrewing() && block.getType() == Material.WATER_CAULDRON) {
+                if ((item.getType() == Material.GLASS_BOTTLE || item.getType() == Material.ARROW) && entity.isCanBrewing() && block.getType() == Material.WATER_CAULDRON) {
                     event.setCancelled(true);
                     Levelled level = (Levelled) block.getBlockData();
+
+                    if (!ConfigOBJ.config.enablePotionArrow && item.getType() == Material.ARROW) {
+                        return;
+                    }
+
                     if (level.getLevel() != 0) {
-                        ItemStack potion = entity.getPotion();
                         if (level.getLevel() == 1) {
                             block.setType(Material.CAULDRON);
                         } else {
                             level.setLevel(level.getLevel() - 1);
                             block.setBlockData(level);
                         }
-                        block.getWorld().playSound(block.getLocation(), Sound.ITEM_BOTTLE_FILL, 1, 1);
 
-                        item.setAmount(item.getAmount() - 1);
-                        event.getPlayer().getInventory().addItem(potion);
+                        if (item.getType() == Material.GLASS_BOTTLE) {
+                            block.getWorld().playSound(block.getLocation(), Sound.ITEM_BOTTLE_FILL, 1, 1);
+
+                            item.setAmount(item.getAmount() - 1);
+                            event.getPlayer().getInventory().addItem(entity.getPotion());
+                        } else if (item.getType() == Material.ARROW && entity.getDamage() != 0) {
+                            int number = Math.min(item.getAmount(), 8);
+                            block.getWorld().playSound(block.getLocation(), Sound.ITEM_BOTTLE_FILL, 1, 1);
+
+                            item.setAmount(item.getAmount() - number);
+                            event.getPlayer().getInventory().addItem(entity.getPotionArrow(number));
+                        }
                     }
                 }
             }

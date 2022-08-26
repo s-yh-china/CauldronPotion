@@ -15,12 +15,17 @@ public final class CauldronPotion extends BaseJavaPlugin<CauldronPotion> {
 
         ConfigOBJ.initConfig(new File(getDataFolder() + File.separator + "config.json"));
         DataOBJ.initData(new File(getDataFolder() + File.separator + "data.json"));
-        NamespaceSave.init(this);
 
+        NamespaceSave.init(this);
         CauldronEntityManger.init(this);
+
+        ConfigOBJ.saveConfig();
+        DataOBJ.saveData();
 
         registerListener(new DisableOldPotionListener());
         registerListener(new CauldronListener());
+
+        registerCommands(new CauldronCommand(), "cauldronpotion");
     }
 
     @Override

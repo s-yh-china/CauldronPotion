@@ -1,5 +1,6 @@
 package net.violetc.cauldronpotion;
 
+import net.violetc.cauldronpotion.cauldron.CauldronEntity;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -76,13 +77,14 @@ public class PotionHelper {
             Material.PUFFERFISH,
             Material.EGG,
             Material.TURTLE_EGG,
-            Material.BLAZE_ROD
+            Material.BLAZE_ROD,
     };
 
     public static final Material[] potionUnDamageItems = new Material[]{
             Material.NETHER_WART,
             Material.GUNPOWDER,
-            Material.DRAGON_BREATH
+            Material.DRAGON_BREATH,
+            // Material.GLASS_BOTTLE,
     };
 
     private static final List<Material> potionItemList = new ArrayList<>() {{
@@ -507,8 +509,16 @@ public class PotionHelper {
         return list;
     }
 
+    public static void spawnPotionParticle(@NotNull CauldronEntity entity) {
+        spawnPotionParticle(entity.getWorld(), getPotionColor(entity.getDamage()), entity.getBlock().getLocation().add(0.5, 0.85, 0.5));
+    }
+
     public static void spawnPotionParticle(@NotNull World world, @NotNull Color color, @NotNull Location location) {
         world.spawnParticle(Particle.SPELL_MOB, location, 10, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
+    }
+
+    public static void playCauldronAddItemSound(@NotNull CauldronEntity entity) {
+        playCauldronAddItemSound(entity.getWorld(), entity.getBlock().getLocation());
     }
 
     public static void playCauldronAddItemSound(@NotNull World world, @NotNull Location location) {

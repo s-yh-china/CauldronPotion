@@ -4,3 +4,8 @@ main: net.violetc.cauldronpotion.CauldronPotion
 api-version: 1.19
 depend: [ violetcpluginutil ]
 authors: [ violetc ]
+commands:
+  cauldronpotion:
+    description: "CauldronPotion"
+    aliases:
+      - cp

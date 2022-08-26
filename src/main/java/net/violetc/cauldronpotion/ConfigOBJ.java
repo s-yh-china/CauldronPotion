@@ -19,6 +19,8 @@ public class ConfigOBJ extends JsonConfig<ConfigOBJ> {
     public boolean alwaysShowCauldronParticle;
     public boolean saveCauldronDataOnStop;
     public boolean disableCauldronMoveByPiston;
+    public boolean enablePotionArrow;
+    public boolean startBrewingWithNetherWart;
 
     public boolean randomPotionRecipe;
 
@@ -36,6 +38,8 @@ public class ConfigOBJ extends JsonConfig<ConfigOBJ> {
         alwaysShowCauldronParticle = false;
         saveCauldronDataOnStop = false;
         disableCauldronMoveByPiston = false;
+        enablePotionArrow = false;
+        startBrewingWithNetherWart = false;
 
         randomPotionRecipe = true;
 

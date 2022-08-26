@@ -88,7 +88,7 @@ public class CauldronEntityManger {
 
     public static void save() {
         for (CauldronEntity entity : manger.entities.values()) {
-            DataOBJ.data.cauldronDataSave.add(entity.toMap());
+            DataOBJ.data.cauldronDataSave.add(entity.saveMap());
         }
     }
 
