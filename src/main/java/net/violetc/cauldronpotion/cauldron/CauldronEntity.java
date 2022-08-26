@@ -211,12 +211,12 @@ public class CauldronEntity {
     }
 
     public void loadMap(@NotNull Map<String, Object> map) {
-        isCanBrewing = (boolean) map.get("isCanBrewing");
-        isLingering = (boolean) map.get("isLingering");
-        isSplash = (boolean) map.get("isSplash");
-        isAddWater = (boolean) map.get("isAddWater");
-        isAddNetherWart = (boolean) map.get("isAddNetherWart");
-        damage = ((Number) map.get("damage")).intValue();
+        isCanBrewing = (boolean) map.getOrDefault("isCanBrewing", false);
+        isLingering = (boolean) map.getOrDefault("isLingering", false);
+        isSplash = (boolean) map.getOrDefault("isSplash", false);
+        isAddWater = (boolean) map.getOrDefault("isAddWater", false);
+        isAddNetherWart = (boolean) map.getOrDefault("isAddNetherWart", false);
+        damage = ((Number) map.getOrDefault("damage", 0)).intValue();
     }
 
     public void tick() {
