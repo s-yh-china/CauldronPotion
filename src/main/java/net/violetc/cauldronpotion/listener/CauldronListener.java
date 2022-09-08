@@ -59,19 +59,26 @@ public class CauldronListener implements Listener {
 
     @EventHandler
     public void onCauldronChange(@NotNull CauldronLevelChangeEvent event) {
-        if (event.getReason() == CauldronLevelChangeEvent.ChangeReason.BANNER_WASH
-                || event.getReason() == CauldronLevelChangeEvent.ChangeReason.ARMOR_WASH
-                || event.getReason() == CauldronLevelChangeEvent.ChangeReason.SHULKER_WASH) {
-            event.setCancelled(true);
-        }
-
         CauldronEntity entity = CauldronEntityManger.getManger().getOrAddEntity(event.getBlock());
 
+        if (event.getReason() == CauldronLevelChangeEvent.ChangeReason.BANNER_WASH
+                || event.getReason() == CauldronLevelChangeEvent.ChangeReason.ARMOR_WASH
+                || event.getReason() == CauldronLevelChangeEvent.ChangeReason.SHULKER_WASH
+                || event.getReason() == CauldronLevelChangeEvent.ChangeReason.BUCKET_FILL) {
+            if (entity.isHasPotion()) {
+                event.setCancelled(true);
+            }
+        }
+
         if (event.getReason() == CauldronLevelChangeEvent.ChangeReason.NATURAL_FILL) {
-            if (CauldronEntityManger.getManger().hasEntity(event.getBlock())) {
-                if (entity.isCanBrewing()) {
-                    entity.setAddWater(true);
-                }
+            if (entity.isHasPotion()) {
+                entity.setAddWater(true);
+            }
+        }
+
+        if (event.getReason() == CauldronLevelChangeEvent.ChangeReason.BOTTLE_FILL && event.getEntity() == null) {
+            if (entity.isHasPotion()) {
+                event.setCancelled(true);
             }
         }
     }
@@ -94,7 +101,7 @@ public class CauldronListener implements Listener {
                         if (meta.getBasePotionData().getType() == PotionType.WATER) {
                             if (meta.hasCustomEffects() || PersistentDataUtil.getBoolData(meta, NamespaceSave.NEW_POTION_FLAG)) {
                                 event.setCancelled(true);
-                                if (entity.isCanBrewing() && entity.getDamage() != 0) {
+                                if (entity.isHasPotion()) {
                                     block.getWorld().createExplosion(block.getLocation(), 1, true, false, event.getPlayer());
                                     entity.cleanPotion();
 

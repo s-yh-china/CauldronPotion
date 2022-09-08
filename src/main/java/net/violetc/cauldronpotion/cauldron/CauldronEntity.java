@@ -164,6 +164,10 @@ public class CauldronEntity {
         return isAddNetherWart;
     }
 
+    public boolean isHasPotion() {
+        return isCanBrewing && damage != 0;
+    }
+
     public void setAddNetherWart(boolean addNetherWart) {
         isAddNetherWart = addNetherWart;
     }
