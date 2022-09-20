@@ -7,7 +7,7 @@ import net.violetc.violetcpluginutil.BaseJavaPlugin;
 
 import java.io.File;
 
-public final class CauldronPotion extends BaseJavaPlugin<CauldronPotion> {
+public final class CauldronPotion extends BaseJavaPlugin {
 
     @Override
     public void onEnable() {
