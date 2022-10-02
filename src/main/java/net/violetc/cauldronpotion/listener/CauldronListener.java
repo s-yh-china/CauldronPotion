@@ -5,10 +5,15 @@ import net.violetc.cauldronpotion.NamespaceSave;
 import net.violetc.cauldronpotion.cauldron.CauldronEntity;
 import net.violetc.cauldronpotion.cauldron.CauldronEntityManger;
 import net.violetc.violetcpluginutil.PersistentDataUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Levelled;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -23,6 +28,8 @@ import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 
 public class CauldronListener implements Listener {
+
+    private static final NamespacedKey advancementKey = NamespacedKey.minecraft("nether/brew_potion");
 
     @EventHandler
     public void onPlayerPlace(@NotNull BlockPlaceEvent event) {
@@ -88,6 +95,7 @@ public class CauldronListener implements Listener {
         if (event.hasBlock() && event.getClickedBlock() != null && event.hasItem() && event.getItem() != null && !event.getItem().getType().isAir() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Block block = event.getClickedBlock();
             ItemStack item = event.getItem();
+            Player player = event.getPlayer();
             if (block.getType() == Material.CAULDRON || block.getType() == Material.WATER_CAULDRON) {
                 CauldronEntity entity = CauldronEntityManger.getManger().getOrAddEntity(block);
 
@@ -102,7 +110,7 @@ public class CauldronListener implements Listener {
                             if (meta.hasCustomEffects() || PersistentDataUtil.getBoolData(meta, NamespaceSave.NEW_POTION_FLAG)) {
                                 event.setCancelled(true);
                                 if (entity.isHasPotion()) {
-                                    block.getWorld().createExplosion(block.getLocation(), 1, true, false, event.getPlayer());
+                                    block.getWorld().createExplosion(block.getLocation(), 1, true, false, player);
                                     entity.cleanPotion();
 
                                     block.setType(Material.CAULDRON);
@@ -117,7 +125,7 @@ public class CauldronListener implements Listener {
                         } else {
                             event.setCancelled(true);
                             if (entity.isCanBrewing()) {
-                                block.getWorld().createExplosion(block.getLocation(), 2, true, false, event.getPlayer());
+                                block.getWorld().createExplosion(block.getLocation(), 2, true, false, player);
                                 entity.cleanPotion();
 
                                 block.setType(Material.CAULDRON);
@@ -150,13 +158,25 @@ public class CauldronListener implements Listener {
                             block.getWorld().playSound(block.getLocation(), Sound.ITEM_BOTTLE_FILL, 1, 1);
 
                             item.setAmount(item.getAmount() - 1);
-                            event.getPlayer().getInventory().addItem(entity.getPotion());
+                            player.getInventory().addItem(entity.getPotion());
                         } else if (item.getType() == Material.ARROW && entity.getDamage() != 0) {
                             int number = Math.min(item.getAmount(), 8);
                             block.getWorld().playSound(block.getLocation(), Sound.ITEM_BOTTLE_FILL, 1, 1);
 
                             item.setAmount(item.getAmount() - number);
-                            event.getPlayer().getInventory().addItem(entity.getPotionArrow(number));
+                            player.getInventory().addItem(entity.getPotionArrow(number));
+                        }
+                    }
+
+                    if (ConfigOBJ.config.giveAdvancement) {
+                        Advancement advancement = Bukkit.getAdvancement(advancementKey);
+                        if (advancement != null) {
+                            AdvancementProgress progress = player.getAdvancementProgress(advancement);
+                            if (!progress.isDone()) {
+                                for (String c : progress.getRemainingCriteria()) {
+                                    progress.awardCriteria(c);
+                                }
+                            }
                         }
                     }
                 }

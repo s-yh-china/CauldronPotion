@@ -40,6 +40,7 @@ public class CauldronEntity {
     private boolean isLingering = false;
     private boolean isAddWater = false;
     private boolean isAddNetherWart = false;
+    private boolean isInverted = false;
 
     private boolean isRemove = false;
 
@@ -164,6 +165,10 @@ public class CauldronEntity {
         return isAddNetherWart;
     }
 
+    public boolean isInverted() {
+        return isInverted;
+    }
+
     public boolean isHasPotion() {
         return isCanBrewing && damage != 0;
     }
@@ -193,6 +198,7 @@ public class CauldronEntity {
         isSplash = false;
         isAddNetherWart = false;
         isAddWater = false;
+        isInverted = false;
         damage = 0;
     }
 
@@ -204,6 +210,7 @@ public class CauldronEntity {
         map.put("isSplash", isSplash);
         map.put("isAddWater", isAddWater);
         map.put("isAddNetherWart", isAddNetherWart);
+        map.put("isInverted", isInverted);
         map.put("damage", damage);
 
         map.put("world", world.getName());
@@ -220,6 +227,7 @@ public class CauldronEntity {
         isSplash = (boolean) map.getOrDefault("isSplash", false);
         isAddWater = (boolean) map.getOrDefault("isAddWater", false);
         isAddNetherWart = (boolean) map.getOrDefault("isAddNetherWart", false);
+        isInverted = (boolean) map.getOrDefault("isInverted", false);
         damage = ((Number) map.getOrDefault("damage", 0)).intValue();
     }
 
@@ -230,6 +238,8 @@ public class CauldronEntity {
 
         boolean flag = block.getType() == Material.WATER_CAULDRON;
         boolean flag1 = block.getType() == Material.CAULDRON;
+        boolean flag2 = nextBlock.getType() == Material.SOUL_FIRE;
+        boolean flag3 = flag2 || nextBlock.getType() == Material.FIRE;
 
         if (!flag1 && !flag) {
             remove();
@@ -237,12 +247,13 @@ public class CauldronEntity {
         }
 
         if (!isCanBrewing) {
-            if (flag && nextBlock.getType() == Material.FIRE) {
+            if (flag && flag3) {
+                isInverted = flag2;
                 isCanBrewing = true;
                 cleanPotion();
             }
         } else {
-            if (flag1 || nextBlock.getType() != Material.FIRE) {
+            if (flag1 || !flag3) {
                 isCanBrewing = false;
                 cleanPotion();
                 return;
@@ -252,7 +263,7 @@ public class CauldronEntity {
         if (isCanBrewing) {
             if (isAddWater) {
                 isAddWater = false;
-                this.damage = PotionHelper.parsePotionItemData(PotionHelper.waterPotionData, damage);
+                this.damage = PotionHelper.parsePotionItemData(PotionHelper.waterPotionData, damage, false);
             }
 
             Collection<Entity> items = world.getNearbyEntities(box);
@@ -296,7 +307,7 @@ public class CauldronEntity {
                                 }
 
                                 for (int i = item.getItemStack().getAmount(); i > 0; i--) {
-                                    int newDamage = PotionHelper.getDamageChange(item.getItemStack().getType(), damage);
+                                    int newDamage = PotionHelper.getDamageChange(item.getItemStack().getType(), damage, isInverted);
                                     if (ConfigOBJ.config.alwaysShowCauldronParticle || newDamage != damage) {
                                         PotionHelper.spawnPotionParticle(this);
                                     }

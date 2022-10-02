@@ -176,37 +176,34 @@ public class PotionHelper {
     }
 
     public static String getPotionPrefix(int damage) {
-        int number = getPrefixNumber(damage);
-        return potionPrefixes[number];
+        return potionPrefixes[getPrefixNumber(damage)];
     }
 
     public static boolean isBrewingItem(@NotNull ItemStack item) {
         return potionItemList.contains(item.getType());
     }
 
-    public static int getDamageChange(@NotNull Material material, int damage) {
+    public static int getDamageChange(@NotNull Material material, int damage, boolean inverted) {
         if (material == Material.NETHER_WART) {
             return getLiquidDataChangeWithNetherWarts(damage);
         }
 
         if (ConfigOBJ.config.randomPotionRecipe) {
-            return parsePotionItemData(DataOBJ.data.itemPotionData.get(material), damage);
+            return parsePotionItemData(DataOBJ.data.itemPotionData.get(material), damage, inverted);
         }
 
         return damage;
     }
 
-    public static int parsePotionItemData(@NotNull String data, int damage) {
+    public static int parsePotionItemData(@NotNull String data, int damage, boolean inverted) {
         StringBuilder damageString = new StringBuilder(getFormatBinaryString(damage));
 
         StringBuilder value = new StringBuilder();
-        boolean flag = false;
         for (int i = 0; i < data.length(); i++) {
             char c = data.charAt(i);
             if (c == '+' || c == '-') {
-                flag = c == '+';
                 if (value.length() > 0) {
-                    damageString.setCharAt(Integer.parseInt(value.toString()), flag ? '1' : '0');
+                    damageString.setCharAt(Integer.parseInt(value.toString()), (c == '+' ^ inverted) ? '1' : '0');
                     value = new StringBuilder();
                 }
             } else {

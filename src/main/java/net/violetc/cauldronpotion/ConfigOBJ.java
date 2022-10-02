@@ -22,6 +22,8 @@ public class ConfigOBJ extends JsonConfig<ConfigOBJ> {
     public boolean enablePotionArrow;
     public boolean startBrewingWithNetherWart;
 
+    public boolean giveAdvancement;
+
     public boolean randomPotionRecipe;
 
     public long potionSeed;
@@ -42,6 +44,8 @@ public class ConfigOBJ extends JsonConfig<ConfigOBJ> {
         startBrewingWithNetherWart = false;
 
         randomPotionRecipe = true;
+
+        giveAdvancement = true;
 
         potionSeed = Bukkit.getWorlds().get(0).getSeed();
 
