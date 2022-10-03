@@ -203,7 +203,7 @@ public class PotionHelper {
             char c = data.charAt(i);
             if (c == '+' || c == '-') {
                 if (value.length() > 0) {
-                    damageString.setCharAt(Integer.parseInt(value.toString()), (c == '+' ^ inverted) ? '1' : '0');
+                    damageString.setCharAt(Integer.parseInt(value.toString()), ((c == '+') ^ inverted) ? '1' : '0');
                     value = new StringBuilder();
                 }
             } else {

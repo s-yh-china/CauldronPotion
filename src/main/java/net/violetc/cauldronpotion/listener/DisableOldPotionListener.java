@@ -66,7 +66,7 @@ public class DisableOldPotionListener implements Listener {
                     item.setItemMeta(meta);
                     potion1.setItem(item);
 
-                    event.setCancelled(true);
+                    // event.setCancelled(true);
                     // TODO mes
                 }
             }

@@ -142,8 +142,10 @@ public class CauldronListener implements Listener {
                     event.setCancelled(true);
                     Levelled level = (Levelled) block.getBlockData();
 
-                    if (!ConfigOBJ.config.enablePotionArrow && item.getType() == Material.ARROW) {
-                        return;
+                    if (item.getType() == Material.ARROW) {
+                        if (!ConfigOBJ.config.enablePotionArrow || (ConfigOBJ.config.potionArrowNeedLingeringPotion && !entity.isLingering())) {
+                            return;
+                        }
                     }
 
                     if (level.getLevel() != 0) {
