@@ -42,7 +42,7 @@ public class CauldronListener implements Listener {
 
     @EventHandler
     public void onPistonExtend(@NotNull BlockPistonExtendEvent event) {
-        if (ConfigOBJ.config.disableCauldronMoveByPiston) {
+        if (ConfigOBJ.config.cauldron.disableCauldronMoveByPiston) {
             for (Block block : event.getBlocks()) {
                 if (block.getType() == Material.CAULDRON || block.getType() == Material.WATER_CAULDRON) {
                     event.setCancelled(true);
@@ -54,7 +54,7 @@ public class CauldronListener implements Listener {
 
     @EventHandler
     public void onPistonRetract(@NotNull BlockPistonRetractEvent event) {
-        if (ConfigOBJ.config.disableCauldronMoveByPiston) {
+        if (ConfigOBJ.config.cauldron.disableCauldronMoveByPiston) {
             for (Block block : event.getBlocks()) {
                 if (block.getType() == Material.CAULDRON || block.getType() == Material.WATER_CAULDRON) {
                     event.setCancelled(true);
@@ -143,7 +143,7 @@ public class CauldronListener implements Listener {
                     Levelled level = (Levelled) block.getBlockData();
 
                     if (item.getType() == Material.ARROW) {
-                        if (!ConfigOBJ.config.enablePotionArrow || (ConfigOBJ.config.potionArrowNeedLingeringPotion && !entity.isLingering())) {
+                        if (!ConfigOBJ.config.cauldron.enablePotionArrow || (ConfigOBJ.config.cauldron.potionArrowNeedLingeringPotion && !entity.isLingering())) {
                             return;
                         }
                     }
@@ -170,7 +170,7 @@ public class CauldronListener implements Listener {
                         }
                     }
 
-                    if (ConfigOBJ.config.giveAdvancement) {
+                    if (ConfigOBJ.config.misc.giveAdvancement) {
                         Advancement advancement = Bukkit.getAdvancement(advancementKey);
                         if (advancement != null) {
                             AdvancementProgress progress = player.getAdvancementProgress(advancement);

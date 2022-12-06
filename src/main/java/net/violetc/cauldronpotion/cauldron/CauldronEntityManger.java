@@ -69,7 +69,7 @@ public class CauldronEntityManger {
     public static void init(JavaPlugin plugin) {
         if (manger == null) {
             manger = new CauldronEntityManger(plugin);
-            if (ConfigOBJ.config.saveCauldronDataOnStop) {
+            if (ConfigOBJ.config.cauldron.saveCauldronDataOnStop) {
                 load();
             }
         }

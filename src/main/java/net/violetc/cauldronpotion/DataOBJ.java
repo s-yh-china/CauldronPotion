@@ -22,7 +22,7 @@ public class DataOBJ extends JsonConfig<DataOBJ> {
     @Override
     protected DataOBJ setUp() {
 
-        itemPotionData = randomItemPotionData(ConfigOBJ.config.potionSeed);
+        itemPotionData = randomItemPotionData(ConfigOBJ.config.misc.potionSeed);
         cauldronDataSave = new ArrayList<>();
 
         return this;

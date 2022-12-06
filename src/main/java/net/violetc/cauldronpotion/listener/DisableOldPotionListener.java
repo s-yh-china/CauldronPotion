@@ -31,7 +31,7 @@ public class DisableOldPotionListener implements Listener {
     @EventHandler
     public void onUseBrewingStand(@NotNull InventoryOpenEvent event) {
         if (event.getInventory().getType() == InventoryType.BREWING) {
-            if (ConfigOBJ.config.disableBrewingStand) {
+            if (ConfigOBJ.config.disable.disableBrewingStand) {
                 event.setCancelled(true);
             }
         }
@@ -42,7 +42,7 @@ public class DisableOldPotionListener implements Listener {
         ItemStack item = event.getItem();
         if (item.getType() == Material.POTION) {
             if (!PersistentDataUtil.getBoolData(PersistentDataUtil.getItemHolder(item), NamespaceSave.NEW_POTION_FLAG)) {
-                if (ConfigOBJ.config.disableOldPotion) {
+                if (ConfigOBJ.config.disable.disableOldPotion) {
                     event.setItem(new PotionBuilder().setBasePotionData(new PotionData(PotionType.WATER)).build());
                     // TODO mes
                 }
@@ -52,7 +52,7 @@ public class DisableOldPotionListener implements Listener {
 
     @EventHandler
     public void onDropPotion(@NotNull ProjectileLaunchEvent event) {
-        if (ConfigOBJ.config.disableOldPotion) {
+        if (ConfigOBJ.config.disable.disableOldPotion) {
             if (event.getEntity() instanceof ThrownPotion potion && potion.getShooter() instanceof Player) {
                 if (!PersistentDataUtil.getBoolData(PersistentDataUtil.getItemHolder(potion.getItem()), NamespaceSave.NEW_POTION_FLAG)) {
                     ThrownPotion potion1 = (ThrownPotion) potion.getWorld().spawnEntity(potion.getLocation(), potion.getType());
@@ -75,7 +75,7 @@ public class DisableOldPotionListener implements Listener {
 
     @EventHandler
     public void onShootPotionArrow(@NotNull EntityShootBowEvent event) {
-        if (ConfigOBJ.config.disableOldPotion) {
+        if (ConfigOBJ.config.disable.disableOldPotion) {
             if (event.getEntity() instanceof Player && event.getConsumable() != null) {
                 if (event.getConsumable().getType() == Material.TIPPED_ARROW && event.getProjectile() instanceof Arrow arrow) {
                     if (!PersistentDataUtil.getBoolData(PersistentDataUtil.getItemHolder(event.getConsumable()), NamespaceSave.NEW_POTION_FLAG)) {

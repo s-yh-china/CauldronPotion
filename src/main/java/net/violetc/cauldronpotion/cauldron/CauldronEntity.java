@@ -3,9 +3,9 @@ package net.violetc.cauldronpotion.cauldron;
 import net.violetc.cauldronpotion.ConfigOBJ;
 import net.violetc.cauldronpotion.NamespaceSave;
 import net.violetc.cauldronpotion.PotionHelper;
-import net.violetc.violetcpluginutil.itembuilder.PotionBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class CauldronEntity {
 
@@ -33,6 +34,7 @@ public class CauldronEntity {
     private final Block block;
     private final Block nextBlock;
     private final BoundingBox box;
+    private final Random random = new Random();
 
     private int damage = 0;
     private boolean isCanBrewing = false;
@@ -74,12 +76,12 @@ public class CauldronEntity {
                         meta.addCustomEffect(effect, false);
                     }
 
-                    if (!ConfigOBJ.config.displayPotionMeta) {
+                    if (!ConfigOBJ.config.display.displayPotionMeta) {
                         meta.setLore(List.of(ChatColor.GRAY + "你并不知晓其中的效果"));
                         meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
                     }
 
-                    if (ConfigOBJ.config.displayPotionMeta && ConfigOBJ.config.displayPotionDamage) {
+                    if (ConfigOBJ.config.display.displayPotionMeta && ConfigOBJ.config.display.displayPotionDamage) {
                         meta.setLore(List.of(ChatColor.GRAY + "药水修饰值: " + damage));
                     }
                 }
@@ -112,12 +114,12 @@ public class CauldronEntity {
                     meta.addCustomEffect(new PotionEffect(effect.getType(), effect.getDuration() / 8, effect.getAmplifier()), false);
                 }
 
-                if (!ConfigOBJ.config.displayPotionMeta) {
+                if (!ConfigOBJ.config.display.displayPotionMeta) {
                     meta.setLore(List.of(ChatColor.GRAY + "你并不知晓其中的效果"));
                     meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
                 }
 
-                if (ConfigOBJ.config.displayPotionMeta && ConfigOBJ.config.displayPotionDamage) {
+                if (ConfigOBJ.config.display.displayPotionMeta && ConfigOBJ.config.display.displayPotionDamage) {
                     meta.setLore(List.of(ChatColor.GRAY + "药水箭修饰值: " + damage));
                 }
             }
@@ -274,7 +276,7 @@ public class CauldronEntity {
                             if (PotionHelper.isBrewingItem(item.getItemStack())) {
                                 item.remove();
 
-                                if (ConfigOBJ.config.startBrewingWithNetherWart && item.getItemStack().getType() == Material.NETHER_WART) {
+                                if (ConfigOBJ.config.cauldron.startBrewingWithNetherWart && item.getItemStack().getType() == Material.NETHER_WART) {
                                     if (!isAddNetherWart) {
                                         PotionHelper.spawnPotionParticle(this);
                                         PotionHelper.playCauldronAddItemSound(this);
@@ -283,13 +285,38 @@ public class CauldronEntity {
                                     }
                                 }
 
-                                if (ConfigOBJ.config.startBrewingWithNetherWart && !isAddNetherWart) {
+                                if (ConfigOBJ.config.cauldron.startBrewingWithNetherWart && !isAddNetherWart) {
                                     PotionHelper.playCauldronAddItemSound(this);
                                     continue;
                                 }
 
+                                if (ConfigOBJ.config.cauldron.unstableMode.enable) {
+                                    boolean unstable = false;
+                                    int newDamage = -1;
+                                    if (random.nextInt(100) < ConfigOBJ.config.cauldron.unstableMode.failureProbability) {
+                                        unstable = true;
+                                    } else if (random.nextInt(100) < ConfigOBJ.config.cauldron.unstableMode.invertProbability) {
+                                        unstable = true;
+                                        newDamage = PotionHelper.getDamageChange(item.getItemStack().getType(), damage, !isInverted);
+                                    }
+                                    if (unstable) {
+                                        PotionHelper.playCauldronAddItemSound(this);
+                                        if (ConfigOBJ.config.cauldron.unstableMode.hideUnstableMode) {
+                                            if (newDamage != damage || newDamage == -1 || ConfigOBJ.config.cauldron.alwaysShowCauldronParticle) {
+                                                PotionHelper.spawnPotionParticle(this);
+                                            }
+                                        } else {
+                                            world.spawnParticle(Particle.SPELL_MOB, block.getLocation().add(0.5, 0.85, 0.5), 30, 0.5, 0.5, 0.5, 0);
+                                        }
+                                        if (newDamage != -1) {
+                                            this.damage = newDamage;
+                                        }
+                                        continue;
+                                    }
+                                }
+
                                 if (item.getItemStack().getType() == Material.GUNPOWDER) {
-                                    if (ConfigOBJ.config.alwaysShowCauldronParticle || !isSplash) {
+                                    if (ConfigOBJ.config.cauldron.alwaysShowCauldronParticle || !isSplash) {
                                         PotionHelper.spawnPotionParticle(this);
                                     }
                                     PotionHelper.playCauldronAddItemSound(this);
@@ -298,7 +325,7 @@ public class CauldronEntity {
                                 }
 
                                 if (item.getItemStack().getType() == Material.DRAGON_BREATH) {
-                                    if (ConfigOBJ.config.alwaysShowCauldronParticle || !isLingering) {
+                                    if (ConfigOBJ.config.cauldron.alwaysShowCauldronParticle || !isLingering) {
                                         PotionHelper.spawnPotionParticle(this);
                                     }
                                     PotionHelper.playCauldronAddItemSound(this);
@@ -308,7 +335,7 @@ public class CauldronEntity {
 
                                 for (int i = item.getItemStack().getAmount(); i > 0; i--) {
                                     int newDamage = PotionHelper.getDamageChange(item.getItemStack().getType(), damage, isInverted);
-                                    if (ConfigOBJ.config.alwaysShowCauldronParticle || newDamage != damage) {
+                                    if (ConfigOBJ.config.cauldron.alwaysShowCauldronParticle || newDamage != damage) {
                                         PotionHelper.spawnPotionParticle(this);
                                     }
                                     PotionHelper.playCauldronAddItemSound(this);

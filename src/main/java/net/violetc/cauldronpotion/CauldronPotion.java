@@ -32,7 +32,7 @@ public final class CauldronPotion extends BaseJavaPlugin {
     public void onDisable() {
         super.onDisable();
 
-        if (ConfigOBJ.config.saveCauldronDataOnStop) {
+        if (ConfigOBJ.config.cauldron.saveCauldronDataOnStop) {
             CauldronEntityManger.save();
         }
 

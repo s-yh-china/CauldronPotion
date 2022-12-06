@@ -188,7 +188,7 @@ public class PotionHelper {
             return getLiquidDataChangeWithNetherWarts(damage);
         }
 
-        if (ConfigOBJ.config.randomPotionRecipe) {
+        if (ConfigOBJ.config.cauldron.randomPotionRecipe) {
             return parsePotionItemData(DataOBJ.data.itemPotionData.get(material), damage, inverted);
         }
 
