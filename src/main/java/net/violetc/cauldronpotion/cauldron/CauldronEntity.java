@@ -1,9 +1,12 @@
 package net.violetc.cauldronpotion.cauldron;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.violetc.cauldronpotion.ConfigOBJ;
 import net.violetc.cauldronpotion.NamespaceSave;
 import net.violetc.cauldronpotion.PotionHelper;
-import org.bukkit.ChatColor;
+import net.violetc.violetcpluginutil.itembuilder.PotionBuilder;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -12,9 +15,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 import org.bukkit.util.BoundingBox;
@@ -23,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -60,35 +60,29 @@ public class CauldronEntity {
     @Nullable
     public ItemStack getPotion() {
         if (isCanBrewing) {
-            ItemStack potion = getPotionTypeItem();
-            PotionMeta meta = (PotionMeta) potion.getItemMeta();
+            PotionBuilder potion = getPotionBuilder();
 
-            if (meta != null) {
-                if (damage == 0) {
-                    meta.setBasePotionData(new PotionData(PotionType.WATER));
-                } else {
-                    meta.setBasePotionData(new PotionData(PotionType.WATER));
-                    meta.setColor(PotionHelper.getPotionColor(damage));
-                    meta.getPersistentDataContainer().set(NamespaceSave.NEW_POTION_FLAG, PersistentDataType.INTEGER, 1);
-                    meta.setDisplayName(PotionHelper.getPotionPrefix(damage) + "药水");
+            if (damage == 0) {
+                potion.setBasePotionType(PotionType.WATER);
+            } else {
+                potion.setBasePotionType(PotionType.WATER);
+                potion.setColor(PotionHelper.getPotionColor(damage));
+                potion.addPersistentData(NamespaceSave.NEW_POTION_FLAG, PersistentDataType.INTEGER, 1);
+                potion.setName(PotionHelper.getPotionPrefix(damage) + "药水");
 
-                    for (PotionEffect effect : PotionHelper.getPotionEffect(damage)) {
-                        meta.addCustomEffect(effect, false);
-                    }
+                for (PotionEffect effect : PotionHelper.getPotionEffect(damage)) {
+                    potion.addCustomEffect(effect, false);
+                }
 
-                    if (!ConfigOBJ.config.display.displayPotionMeta) {
-                        meta.setLore(List.of(ChatColor.GRAY + "你并不知晓其中的效果"));
-                        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-                    }
-
-                    if (ConfigOBJ.config.display.displayPotionMeta && ConfigOBJ.config.display.displayPotionDamage) {
-                        meta.setLore(List.of(ChatColor.GRAY + "药水修饰值: " + damage));
-                    }
+                if (!ConfigOBJ.config.display.displayPotionMeta) {
+                    potion.setLore(0, Component.text("你并不知晓其中的效果").color(NamedTextColor.GRAY));
+                    potion.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+                } else if (ConfigOBJ.config.display.displayPotionDamage) {
+                    potion.setLore(0, Component.text("药水修饰值: " + damage).color(NamedTextColor.GRAY));
                 }
             }
-            potion.setItemMeta(meta);
 
-            return potion;
+            return potion.build();
         } else {
             return null;
         }
@@ -101,45 +95,38 @@ public class CauldronEntity {
                 return new ItemStack(Material.TIPPED_ARROW, number);
             }
 
-            ItemStack arrow = new ItemStack(Material.TIPPED_ARROW, number);
-            PotionMeta meta = (PotionMeta) arrow.getItemMeta();
+            PotionBuilder arrow = new PotionBuilder(Material.TIPPED_ARROW).setAmount(number);
+            arrow.setBasePotionType(PotionType.WATER);
+            arrow.setColor(PotionHelper.getPotionColor(damage));
+            arrow.addPersistentData(NamespaceSave.NEW_POTION_FLAG, PersistentDataType.INTEGER, 1);
+            arrow.setName(PotionHelper.getPotionPrefix(damage) + "药水之箭");
 
-            if (meta != null) {
-                meta.setBasePotionData(new PotionData(PotionType.WATER));
-                meta.setColor(PotionHelper.getPotionColor(damage));
-                meta.getPersistentDataContainer().set(NamespaceSave.NEW_POTION_FLAG, PersistentDataType.INTEGER, 1);
-                meta.setDisplayName(PotionHelper.getPotionPrefix(damage) + "药水之箭");
-
-                for (PotionEffect effect : PotionHelper.getPotionEffect(damage)) {
-                    meta.addCustomEffect(new PotionEffect(effect.getType(), effect.getDuration() / 8, effect.getAmplifier()), false);
-                }
-
-                if (!ConfigOBJ.config.display.displayPotionMeta) {
-                    meta.setLore(List.of(ChatColor.GRAY + "你并不知晓其中的效果"));
-                    meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-                }
-
-                if (ConfigOBJ.config.display.displayPotionMeta && ConfigOBJ.config.display.displayPotionDamage) {
-                    meta.setLore(List.of(ChatColor.GRAY + "药水箭修饰值: " + damage));
-                }
+            for (PotionEffect effect : PotionHelper.getPotionEffect(damage)) {
+                arrow.addCustomEffect(new PotionEffect(effect.getType(), effect.getDuration() / 8, effect.getAmplifier()), false);
             }
-            arrow.setItemMeta(meta);
 
-            return arrow;
+            if (!ConfigOBJ.config.display.displayPotionMeta) {
+                arrow.setLore(0, Component.text("你并不知晓其中的效果").color(NamedTextColor.GRAY));
+                arrow.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+            } else if (ConfigOBJ.config.display.displayPotionDamage) {
+                arrow.setLore(0, Component.text("药水箭修饰值: " + damage).color(NamedTextColor.GRAY));
+            }
+
+            return arrow.build();
         } else {
             return null;
         }
     }
 
-    public ItemStack getPotionTypeItem() {
+    public PotionBuilder getPotionBuilder() {
         if (isSplash) {
             if (isLingering) {
-                return new ItemStack(Material.LINGERING_POTION);
+                return new PotionBuilder(Material.LINGERING_POTION);
             } else {
-                return new ItemStack(Material.SPLASH_POTION);
+                return new PotionBuilder(Material.SPLASH_POTION);
             }
         } else {
-            return new ItemStack(Material.POTION);
+            return new PotionBuilder(Material.POTION);
         }
     }
 
@@ -306,7 +293,7 @@ public class CauldronEntity {
                                                 PotionHelper.spawnPotionParticle(this);
                                             }
                                         } else {
-                                            world.spawnParticle(Particle.SPELL_MOB, block.getLocation().add(0.5, 0.85, 0.5), 30, 0.5, 0.5, 0.5, 0);
+                                            world.spawnParticle(Particle.ENTITY_EFFECT, block.getLocation().add(0.5, 0.85, 0.5), 30, 0.5, 0.5, 0.5, Color.WHITE);
                                         }
                                         if (newDamage != -1) {
                                             this.damage = newDamage;

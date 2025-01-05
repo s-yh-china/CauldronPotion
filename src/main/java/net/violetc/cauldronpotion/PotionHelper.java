@@ -73,11 +73,29 @@ public class PotionHelper {
             Material.POISONOUS_POTATO,
             Material.GLOW_BERRIES,
             Material.TROPICAL_FISH,
-            Material.SCUTE,
+            Material.TURTLE_SCUTE,
             Material.PUFFERFISH,
             Material.EGG,
             Material.TURTLE_EGG,
             Material.BLAZE_ROD,
+            Material.GLOW_LICHEN,
+            Material.CRIMSON_FUNGUS,
+            Material.WARPED_FUNGUS,
+            Material.TORCHFLOWER,
+            Material.PINK_PETALS,
+            Material.PITCHER_PLANT,
+            Material.CHORUS_FLOWER,
+            Material.SEA_PICKLE,
+            Material.SCULK_VEIN,
+            Material.ECHO_SHARD,
+            Material.POPPED_CHORUS_FRUIT,
+            Material.GOAT_HORN,
+            Material.AMETHYST_CLUSTER,
+            Material.DEAD_BUSH,
+            Material.HANGING_ROOTS,
+            Material.SMALL_DRIPLEAF,
+            Material.MANGROVE_ROOTS,
+            Material.SPORE_BLOSSOM
     };
 
     public static final Material[] potionUnDamageItems = new Material[]{
@@ -96,16 +114,16 @@ public class PotionHelper {
 
     public static final Map<PotionEffectType, String> potionRequirements = new HashMap<>() {{
         put(PotionEffectType.SPEED, "!10 & !4 & 5*2+0 & >1 | !7 & !4 & 5*2+0 & >1");
-        put(PotionEffectType.SLOW, "10 & 7 & !4 & 7+5+1-0");
-        put(PotionEffectType.FAST_DIGGING, "2 & 12+2+6-1-7 & <8");
-        put(PotionEffectType.SLOW_DIGGING, "!2 & !1*2-9 & 14-5");
-        put(PotionEffectType.INCREASE_DAMAGE, "9 & 3 & 9+4+5 & <11");
-        put(PotionEffectType.HEAL, "11 & <6");
-        put(PotionEffectType.HARM, "!11 & 1 & 10 & !7");
-        put(PotionEffectType.JUMP, "8 & 2+0 & <5");
-        put(PotionEffectType.CONFUSION, "8*2-!7+4-11 & !2 | 13 & 11 & 2*3-1-5");
+        put(PotionEffectType.SLOWNESS, "10 & 7 & !4 & 7+5+1-0");
+        put(PotionEffectType.HASTE, "2 & 12+2+6-1-7 & <8");
+        put(PotionEffectType.MINING_FATIGUE, "!2 & !1*2-9 & 14-5");
+        put(PotionEffectType.STRENGTH, "9 & 3 & 9+4+5 & <11");
+        put(PotionEffectType.INSTANT_HEALTH, "11 & <6");
+        put(PotionEffectType.INSTANT_DAMAGE, "!11 & 1 & 10 & !7");
+        put(PotionEffectType.JUMP_BOOST, "8 & 2+0 & <5");
+        put(PotionEffectType.NAUSEA, "8*2-!7+4-11 & !2 | 13 & 11 & 2*3-1-5");
         put(PotionEffectType.REGENERATION, "!14 & 13*3-!0-!5-8");
-        put(PotionEffectType.DAMAGE_RESISTANCE, "10 & 4 & 10+5+6 & <9");
+        put(PotionEffectType.RESISTANCE, "10 & 4 & 10+5+6 & <9");
         put(PotionEffectType.FIRE_RESISTANCE, "14 & !5 & 6-!1 & 14+13+12");
         put(PotionEffectType.WATER_BREATHING, "0+1+12 & !6 & 10 & !11 & !13");
         put(PotionEffectType.INVISIBILITY, "2+5+13-0-4 & !7 & !1 & >5");
@@ -132,11 +150,11 @@ public class PotionHelper {
 
     public static final Map<PotionEffectType, String> potionAmplifiers = new HashMap<>() {{
         put(PotionEffectType.SPEED, "7+!3-!1");
-        put(PotionEffectType.SLOW_DIGGING, "1+0-!11");
-        put(PotionEffectType.INCREASE_DAMAGE, "2+7-!12");
-        put(PotionEffectType.HEAL, "11+!0-!1-!14");
-        put(PotionEffectType.HARM, "!11-!14+!0-!1");
-        put(PotionEffectType.DAMAGE_RESISTANCE, "12-!2");
+        put(PotionEffectType.HASTE, "1+0-!11");
+        put(PotionEffectType.STRENGTH, "2+7-!12");
+        put(PotionEffectType.INSTANT_HEALTH, "11+!0-!1-!14");
+        put(PotionEffectType.INSTANT_DAMAGE, "!11-!14+!0-!1");
+        put(PotionEffectType.RESISTANCE, "12-!2");
         put(PotionEffectType.POISON, "14>5");
         // TODO start remake
         put(PotionEffectType.WITHER, "13>6");
@@ -164,6 +182,7 @@ public class PotionHelper {
         return damage.length() > index && damage.charAt(index) == '1';
     }
 
+    @NotNull
     public static Color getPotionColor(int damage) {
         int red = (getNumberInBinaryDamage(damage, 2, 14, 11, 8, 5) ^ 3) << 3;
         int green = (getNumberInBinaryDamage(damage, 12, 3, 1, 7, 9) ^ 6) << 3;
@@ -202,7 +221,7 @@ public class PotionHelper {
         for (int i = 0; i < data.length(); i++) {
             char c = data.charAt(i);
             if (c == '+' || c == '-') {
-                if (value.length() > 0) {
+                if (!value.isEmpty()) {
                     damageString.setCharAt(Integer.parseInt(value.toString()), ((c == '+') ^ inverted) ? '1' : '0');
                     value = new StringBuilder();
                 }
@@ -511,7 +530,7 @@ public class PotionHelper {
     }
 
     public static void spawnPotionParticle(@NotNull World world, @NotNull Color color, @NotNull Location location) {
-        world.spawnParticle(Particle.SPELL_MOB, location, 10, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
+        world.spawnParticle(Particle.ENTITY_EFFECT, location, 15, 0.5, 0.5, 0.5, color);
     }
 
     public static void playCauldronAddItemSound(@NotNull CauldronEntity entity) {
